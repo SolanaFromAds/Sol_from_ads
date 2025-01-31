@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "name": "AdBlocker SOL Rewards",
+  "version": "1.0",
+  "description": "Blocks ads and rewards users with SOL.",
+  "permissions": ["webRequest", "webRequestBlocking", "storage", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
+
+// File: extension/content.js
+let adCount = 0;
+const adSelectors = ['iframe', 'ins', '[id*=ads]', '[class*=ads]'];
+
+function blockAds() {
+  document.querySelectorAll(adSelectors.join(", ")).forEach(ad => {
+    ad.remove();
+    adCount++;
+    chrome.storage.local.set({ adCount });
+  });
+}
+
+const observer = new MutationObserver(blockAds);
+observer.observe(document, { childList: true, subtree: true });
+
+// File: extension/background.js
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.set({ adCount: 0 });
+});
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.adCount) {
+    fetch("http://localhost:3000/update-ads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adsBlocked: changes.adCount.newValue })
+    });
+  }
+});
+
+// File: extension/popup.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AdBlocker Rewards</title>
+  <script src="popup.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h2>Ads Blocked: <span id="adCount">0</span></h2>
+  <h3>Estimated SOL: <span id="solAmount">0.000</span></h3>
+</body>
+</html>
+
+// File: extension/popup.js
+document.addEventListener("DOMContentLoaded", () => {
+  chrome.storage.local.get("adCount", data => {
+    document.getElementById("adCount").textContent = data.adCount || 0;
+    document.getElementById("solAmount").textContent = ((data.adCount || 0) / 250 * 0.005).toFixed(6);
+  });
+});
