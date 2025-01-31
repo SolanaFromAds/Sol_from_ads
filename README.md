@@ -20,4 +20,4 @@ Special thanks to this repository which I based a large part of the project from
 
 # Get in touch
 
-[Contact @owocki on twitter](http://twitter.com/SolFromAds).
+[Contact @SolFromAds on twitter](http://twitter.com/SolFromAds).
