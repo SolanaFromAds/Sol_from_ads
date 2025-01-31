@@ -7,12 +7,6 @@ I got the idea for this project after seeing an ad for pie and thinking that pay
 
 I am still experimenting with the exact payout amount per x ads blocked but currently ~250 ads blocked = $0.05
 
-# Forked from
-
-Special thanks to this repository which I based a large part of the project from even if im going against the intended purpose of their repository
-
-* https://github.com/sitexw/FuckAdBlock
-
 # How you can help
 
 * _Engineer?_ Can you help with cross-browser compatibility and bringing this project to multiple browsers?
